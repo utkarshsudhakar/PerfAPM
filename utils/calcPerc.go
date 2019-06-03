@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -13,6 +14,6 @@ func CalcPerc(diff float64, relativeTime time.Time) float64 {
 		diff := timeNew.Sub(timeOld)
 	*/
 	relativeTimeInSecs := float64((relativeTime.Hour() * 3600) + (relativeTime.Minute() * 60) + (relativeTime.Second()))
-
+	fmt.Println("relativeTimeInSecs")
 	return float64((diff / relativeTimeInSecs) * 100)
 }

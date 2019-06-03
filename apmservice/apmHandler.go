@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/tidwall/sjson"
 	"github.com/utkarshsudhakar/PerfAPM/config"
 	"github.com/utkarshsudhakar/PerfAPM/utils"
-	"github.com/tidwall/sjson"
 )
 
 func test(w http.ResponseWriter, r *http.Request) {
@@ -59,14 +59,16 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 					timeOld, _ := time.Parse(config.TimeFormat, svOld)
 					timeNew, _ := time.Parse(config.TimeFormat, svNew)
 					diff := timeOld.Sub(timeNew)
+					fmt.Println(diff)
 
-					if diff > 0 {
+					if diff < 0 {
 						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+
 						p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 
 					} else {
 
-						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeNew)
+						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 						p = p + "<tr style='background:#ff9e82'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 					}
 
