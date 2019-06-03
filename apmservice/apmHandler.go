@@ -59,9 +59,8 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 					timeOld, _ := time.Parse(config.TimeFormat, svOld)
 					timeNew, _ := time.Parse(config.TimeFormat, svNew)
 					diff := timeOld.Sub(timeNew)
-					fmt.Println(diff)
 
-					if diff < 0 {
+					if diff >= 0 {
 						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
 						p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
@@ -115,7 +114,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 
 		if resp == nil {
 			flag = false
-			utils.RespondWithJSON("Please check hostname or port ", w, r)
+			utils.RespondWithText("Please check hostname or port ", w, r)
 			break
 
 		}
@@ -129,7 +128,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 		if jsonData.Error != "" {
 
 			flag = false
-			utils.RespondWithJSON("Incorrect username/pass ", w, r)
+			utils.RespondWithText("Incorrect username/pass ", w, r)
 			break
 		}
 
@@ -153,7 +152,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(len(jobData))
 		if !rf {
 			flag = false
-			utils.RespondWithJSON("Please check Resource Name ", w, r)
+			utils.RespondWithText("Please check Resource Name ", w, r)
 			break
 		}
 
@@ -165,6 +164,13 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < len(jobData); i++ {
 			//fmt.Println(jobData[i].Type)
 			//sresp, _ := time.Parse(config.TimeFormat, resp).String()
+
+			if jobData[i].Status != "SUCCESS" {
+
+				utils.RespondWithText("Scanner Execution not completed or Failed! Please Check.", w, r)
+				flag = false
+				break
+			}
 
 			taskResponseData := utils.GetTaskData(ldmHeader.InfaToken, jobData[i].ID, jobData[i].Taskid, TaskURL, resp, client)
 			//fmt.Println(len(taskResponseData[0].Progress))
@@ -190,30 +196,33 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 
 			elasticJson, _ = sjson.Set(elasticJson, "Times."+jobData[i].Type, jobData[i].ElapsedTime)
 		}
-		if len(jobData) > 1 && jobData[1].Type != "Purge" {
-			endToEndTime := utils.EndToEndTime(jobData)
-			elasticJson, _ = sjson.Set(elasticJson, "Times.End to End Execution Time", endToEndTime)
-		}
 
-		elasticJson, _ := sjson.Set(elasticJson, "ResourceName", ResourceName)
-		elasticJson, _ = sjson.Set(elasticJson, "Hostname", Hostname)
-		elasticJson, _ = sjson.Set(elasticJson, "Build", Build)
-		elasticJson, _ = sjson.Set(elasticJson, "Release", Release)
-		//fmt.Println(newcookie[0])
-		//fmt.Println(elasticJson)
+		if flag {
 
-		//var t config.TimesResponse
-		//json.Unmarshal([]byte(elasticJson), &t)
-		//fmt.Println(t)
-		rawIn := json.RawMessage(elasticJson)
-		jsonBody, err := rawIn.MarshalJSON()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			if len(jobData) > 1 && jobData[1].Type != "Purge" {
+				endToEndTime := utils.EndToEndTime(jobData)
+				elasticJson, _ = sjson.Set(elasticJson, "Times.End to End Execution Time", endToEndTime)
+			}
+
+			elasticJson, _ := sjson.Set(elasticJson, "ResourceName", ResourceName)
+			elasticJson, _ = sjson.Set(elasticJson, "Hostname", Hostname)
+			elasticJson, _ = sjson.Set(elasticJson, "Build", Build)
+			elasticJson, _ = sjson.Set(elasticJson, "Release", Release)
+			//fmt.Println(newcookie[0])
+			//fmt.Println(elasticJson)
+
+			//var t config.TimesResponse
+			//json.Unmarshal([]byte(elasticJson), &t)
+			//fmt.Println(t)
+			rawIn := json.RawMessage(elasticJson)
+			jsonBody, err := rawIn.MarshalJSON()
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			//fmt.Println(jsonBody)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonBody)
 		}
-		//fmt.Println(jsonBody)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonBody)
 	}
-
 }

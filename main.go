@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/utkarshsudhakar/PerfAPM/apmservice"
+	"./apmservice"
 )
 
 func main() {
