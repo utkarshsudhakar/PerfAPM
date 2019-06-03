@@ -22,3 +22,10 @@ func RespondWithJSON(msg string, w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBody)
 
 }
+
+func RespondWithText(msg string, w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(msg))
+
+}
