@@ -36,6 +36,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	Release := r.URL.Query().Get("Release")         // "10.2.2"
 
+
 	oldBuildData := utils.GetBuildData(oldBuildNum)
 	newBuildData := utils.GetBuildData(newBuildNum)
 
@@ -44,7 +45,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithJSON("BuildNumber not correct or not enough data ", w, r)
 
 	} else {
-
+		
 		p := fmt.Sprintf("<body style='background:wheat'><h3 style='background:#118228;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Build Comparison for %s & %s </h3> <br/><b>Release: %s </b><br/> <br/>", oldBuildNum, newBuildNum, Release)
 
 		for ResourceName, v := range oldBuildData {
@@ -76,7 +77,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		fmt.Println(p)
+		
 		utils.SendMail(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}

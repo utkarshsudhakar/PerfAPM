@@ -13,16 +13,16 @@ func SendMail(body string) {
 
 	from := config.FromEmail
 	pass := config.Password
-	to := config.ToEmail
+	//to := config.ToEmail
 
-	//conf := ReadConfig()
+	conf := ReadConfig()
 
-	//to := conf.ToEmail
+	to := conf.ToEmail
 	host := "mail.informatica.com"
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", "usudhakar@informatica.com", to)
+	m.SetHeader("To", to...)
 	//m.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	m.SetHeader("Subject", "Alert!")
 	m.SetBody("text/html", body)

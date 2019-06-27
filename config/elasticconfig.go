@@ -4,7 +4,7 @@ const ElasticURL = "http://irl75cmgperf07:9200"
 
 //const ElasticURL = "http://34.196.162.239:9200"
 
-const ElasticSearchReportIndex = "testutkarsh"
+const ElasticSearchReportIndex = "testindexemail"
 
 const TimeFormat = "15:04:05"
 
