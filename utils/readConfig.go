@@ -6,7 +6,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"../config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 func ReadConfig() config.Config {
