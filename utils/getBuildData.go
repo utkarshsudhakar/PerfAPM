@@ -9,17 +9,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/utkarshsudhakar/PerfAPM/config"
 	"github.com/olivere/elastic"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 //GetBuildData ...
 func GetBuildData(buildNum string) map[string]map[string]interface{} {
 
 	//Hostname := "irl62dqd07"
+	conf := ReadConfig()
 
 	client, err := elastic.NewClient(
-		elastic.SetURL(config.ElasticURL),
+		elastic.SetURL(conf.ElasticURL),
 		elastic.SetSniff(false),
 		elastic.SetHealthcheckInterval(10*time.Second),
 		elastic.SetErrorLog(log.New(os.Stderr, "ELASTIC ", log.LstdFlags)),
@@ -30,7 +31,7 @@ func GetBuildData(buildNum string) map[string]map[string]interface{} {
 
 	//ping to check connectivity
 
-	info, code, err := client.Ping(config.ElasticURL).Do(context.Background())
+	info, code, err := client.Ping(conf.ElasticURL).Do(context.Background())
 	if err != nil {
 		// Handle error
 		panic(err)
@@ -47,7 +48,7 @@ func GetBuildData(buildNum string) map[string]map[string]interface{} {
 	//for filter based on last build num use aggregation max with release
 
 	SearchResult, err := client.Search().
-		Index(config.ElasticSearchReportIndex). // search in index "testutkarsh"
+		Index(conf.ElasticSearchReportIndex). // search in index "testutkarsh"
 		Query(filterByBuildQuery).
 		Pretty(true).
 		Do(context.Background())
