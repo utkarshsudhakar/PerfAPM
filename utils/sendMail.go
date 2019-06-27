@@ -22,7 +22,7 @@ func SendMail(body string) {
 
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", to)
+	m.SetHeader("To", "usudhakar@informatica.com", to)
 	//m.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	m.SetHeader("Subject", "Alert!")
 	m.SetBody("text/html", body)
