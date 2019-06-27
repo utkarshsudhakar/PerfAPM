@@ -76,7 +76,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		//fmt.Println(p)
+		fmt.Println(p)
 		utils.SendMail(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
