@@ -36,7 +36,6 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	Release := r.URL.Query().Get("Release")         // "10.2.2"
 
-
 	oldBuildData := utils.GetBuildData(oldBuildNum)
 	newBuildData := utils.GetBuildData(newBuildNum)
 
@@ -45,13 +44,13 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithJSON("BuildNumber not correct or not enough data ", w, r)
 
 	} else {
-		
-		p := fmt.Sprintf("<body style='background:wheat'><h3 style='background:#118228;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Build Comparison for %s & %s </h3> <br/><b>Release: %s </b><br/> <br/>", oldBuildNum, newBuildNum, Release)
+
+		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Build Comparison for %s & %s </h3> <br/><b>Release: %s </b><br/> <br/>", oldBuildNum, newBuildNum, Release)
 
 		for ResourceName, v := range oldBuildData {
 
 			if _, ok := newBuildData[ResourceName]; ok {
-				p = p + fmt.Sprintf("<table style='backgound:#fff' border = '1' cellpadding = '2'><tbody><tr><td colspan=5 style='text-align:center;background-color:blue;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldBuildNum, newBuildNum)
+				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldBuildNum, newBuildNum)
 
 				for k := range v {
 
@@ -59,9 +58,9 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 					svNew := newBuildData[ResourceName][k].(string)
 					timeOld, _ := time.Parse(config.TimeFormat, svOld)
 					timeNew, _ := time.Parse(config.TimeFormat, svNew)
-					diff := timeOld.Sub(timeNew)
+					diff := timeNew.Sub(timeOld)
 
-					if diff >= 0 {
+					if diff <= 0 {
 						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
 						p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
@@ -76,8 +75,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 				p = p + "</tbody></table></body><br/><br/>"
 			}
 		}
-
-		
+		//fmt.Println(p)
 		utils.SendMail(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
