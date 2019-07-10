@@ -50,6 +50,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		for ResourceName, v := range oldBuildData {
 
 			if _, ok := newBuildData[ResourceName]; ok {
+
 				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldBuildNum, newBuildNum)
 
 				for k := range v {
@@ -74,6 +75,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 				}
 				p = p + "</tbody></table></body><br/><br/>"
 			}
+
 		}
 		//fmt.Println(p)
 		utils.SendMail(p)

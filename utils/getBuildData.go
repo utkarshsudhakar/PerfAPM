@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -50,6 +49,7 @@ func GetBuildData(buildNum string) map[string]map[string]interface{} {
 	SearchResult, err := client.Search().
 		Index(conf.ElasticSearchReportIndex). // search in index "testutkarsh"
 		Query(filterByBuildQuery).
+		From(0).Size(100).
 		Pretty(true).
 		Do(context.Background())
 
@@ -72,10 +72,11 @@ func GetBuildData(buildNum string) map[string]map[string]interface{} {
 			}
 
 			if t.Times != nil {
-				key := strings.Split(string(t.ResourceName), "_")
+				//key := strings.Split(string(t.ResourceName), "_")
+				key := t.ResourceName
 				myMap = t.Times.(map[string]interface{})
 
-				newMap[key[0]] = myMap
+				newMap[key] = myMap
 			}
 
 		}
