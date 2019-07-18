@@ -30,6 +30,60 @@ func test(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func compareRelease(w http.ResponseWriter, r *http.Request) {
+
+	oldBuildNum := r.URL.Query().Get("oldBuildNum") //427.4
+	oldRelease := r.URL.Query().Get("oldRelease")   // "10.2.2"
+	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
+	newRelease := r.URL.Query().Get("newRelease")
+
+	oldReleaseData := utils.GetReleaseData(oldBuildNum, oldRelease)
+	newReleaseData := utils.GetReleaseData(newBuildNum, newRelease)
+
+	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
+
+		utils.RespondWithJSON("BuildNumber/Release not correct or not enough data ", w, r)
+
+	} else {
+
+		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Release Comparison for %s & %s </h3> <br/> <br/>", oldRelease, newRelease)
+
+		for ResourceName, v := range oldReleaseData {
+
+			if _, ok := newReleaseData[ResourceName]; ok {
+
+				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldRelease, newRelease)
+
+				for k := range v {
+
+					svOld := oldReleaseData[ResourceName][k].(string)
+					svNew := newReleaseData[ResourceName][k].(string)
+					timeOld, _ := time.Parse(config.TimeFormat, svOld)
+					timeNew, _ := time.Parse(config.TimeFormat, svNew)
+					diff := timeNew.Sub(timeOld)
+
+					if diff <= 0 {
+						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+
+						p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+
+					} else {
+
+						percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+						p = p + "<tr style='background:#ff9e82'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+					}
+
+				}
+				p = p + "</tbody></table></body><br/><br/>"
+			}
+
+		}
+		//fmt.Println(p)
+		utils.SendMail(p)
+		utils.RespondWithJSON("Email Sent Successfully", w, r)
+	}
+
+}
 func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 	oldBuildNum := r.URL.Query().Get("oldBuildNum") //427.4
