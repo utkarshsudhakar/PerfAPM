@@ -52,7 +52,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 			if _, ok := newReleaseData[ResourceName]; ok {
 
-				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldRelease, newRelease)
+				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldRelease, newRelease)
 
 				for k := range v {
 
