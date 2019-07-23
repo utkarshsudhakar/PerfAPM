@@ -12,8 +12,6 @@ import (
 func SendMail(body string) {
 
 	from := config.FromEmail
-	pass := config.Password
-	//to := config.ToEmail
 
 	conf := ReadConfig()
 
@@ -28,7 +26,7 @@ func SendMail(body string) {
 	m.SetBody("text/html", body)
 	//m.Attach("test.jpg")
 
-	d := gomail.NewDialer(host, 25, from, pass)
+	d := gomail.NewDialer(host, 25, from, "")
 
 	d.TLSConfig = &tls.Config{
 		InsecureSkipVerify: true,
