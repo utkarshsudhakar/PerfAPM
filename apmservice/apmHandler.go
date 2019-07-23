@@ -45,7 +45,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithJSON("BuildNumber/Release not correct or not enough data ", w, r)
 
 	} else {
-
+		subject := fmt.Sprintf("Release Comparison Report for %s & %s", oldRelease, newRelease)
 		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Release Comparison for %s & %s </h3> <br/> <br/>", oldRelease, newRelease)
 
 		for ResourceName, v := range oldReleaseData {
@@ -79,7 +79,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 		}
 		//fmt.Println(p)
-		utils.SendMail(p)
+		utils.SendMail(p, subject)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
 
@@ -99,6 +99,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 
+		subject := fmt.Sprintf("Release : %s - Build Comparison Report for %s & %s", Release, oldBuildNum, newBuildNum)
 		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Build Comparison for %s & %s </h3> <br/><b>Release: %s </b><br/> <br/>", oldBuildNum, newBuildNum, Release)
 
 		for ResourceName, v := range oldBuildData {
@@ -132,7 +133,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 		}
 		//fmt.Println(p)
-		utils.SendMail(p)
+		utils.SendMail(p, subject)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
 
