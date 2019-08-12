@@ -81,6 +81,8 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 		}
 		//fmt.Println(p)
+		conf := utils.ReadConfig()
+		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
 		utils.SendMail(p, subject)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
