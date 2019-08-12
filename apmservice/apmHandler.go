@@ -133,6 +133,8 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 				}
 				p = p + "</tbody></table></body><br/><br/>"
+				conf := utils.ReadConfig()
+				p = p + "Dashboard URL : " + conf.DashboardURL
 			}
 
 		}
