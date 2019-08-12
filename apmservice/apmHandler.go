@@ -133,12 +133,13 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 				}
 				p = p + "</tbody></table></body><br/><br/>"
-				conf := utils.ReadConfig()
-				p = p + "Dashboard URL : " + conf.DashboardURL
+
 			}
 
 		}
 		//fmt.Println(p)
+		conf := utils.ReadConfig()
+		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
 		utils.SendMail(p, subject)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
