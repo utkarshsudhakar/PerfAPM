@@ -36,9 +36,10 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	oldRelease := r.URL.Query().Get("oldRelease")   // "10.2.2"
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	newRelease := r.URL.Query().Get("newRelease")
+	Hostname := r.URL.Query().Get("Hostname")
 
-	oldReleaseData := utils.GetReleaseData(oldBuildNum, oldRelease)
-	newReleaseData := utils.GetReleaseData(newBuildNum, newRelease)
+	oldReleaseData := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
+	newReleaseData := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
 
 	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
 
@@ -92,10 +93,11 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 	oldBuildNum := r.URL.Query().Get("oldBuildNum") //427.4
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
-	Release := r.URL.Query().Get("Release")         // "10.2.2"
+	Release := r.URL.Query().Get("Release")
+	Hostname := r.URL.Query().Get("Hostname") // "10.2.2"
 
-	oldBuildData := utils.GetBuildData(oldBuildNum)
-	newBuildData := utils.GetBuildData(newBuildNum)
+	oldBuildData := utils.GetBuildData(oldBuildNum, Hostname)
+	newBuildData := utils.GetBuildData(newBuildNum, Hostname)
 
 	if (len(newBuildData) == 0) || (len(oldBuildData) == 0) {
 

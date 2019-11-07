@@ -13,7 +13,7 @@ import (
 )
 
 //GetReleaseData ...
-func GetReleaseData(buildNum string, release string) map[string]map[string]interface{} {
+func GetReleaseData(buildNum string, release string, Hostname string) map[string]map[string]interface{} {
 
 	//Hostname := "irl62dqd07"
 	conf := ReadConfig()
@@ -40,7 +40,8 @@ func GetReleaseData(buildNum string, release string) map[string]map[string]inter
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
 	filterByReleaseQuery := elastic.NewTermQuery("Release.keyword", release)
-	filterQuery := elastic.NewBoolQuery().Must(filterByReleaseQuery).Must(filterByBuildQuery)
+	filterByHostnameQuery := elastic.NewTermQuery("Hostname", Hostname)
+	filterQuery := elastic.NewBoolQuery().Must(filterByReleaseQuery).Must(filterByBuildQuery).Must(filterByHostnameQuery)
 	//searchQuery := elastic.NewRegexpQuery("Hostname", "sql.*")
 	//labelQuery := elastic.NewFilterAggregation
 	//dataQuery := elastic.NewBoolQuery().Must(labelQuery).Must(filterByBuildQuery).

@@ -13,7 +13,7 @@ import (
 )
 
 //GetBuildData ...
-func GetBuildData(buildNum string) map[string]map[string]interface{} {
+func GetBuildData(buildNum string, Hostname string) map[string]map[string]interface{} {
 
 	//Hostname := "irl62dqd07"
 	conf := ReadConfig()
@@ -39,16 +39,16 @@ func GetBuildData(buildNum string) map[string]map[string]interface{} {
 
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
-	//searchQuery := elastic.NewRegexpQuery("Hostname", "sql.*")
+	filterByHostnameQuery := elastic.NewTermQuery("Hostname", Hostname)
 	//labelQuery := elastic.NewFilterAggregation
 	//dataQuery := elastic.NewBoolQuery().Must(labelQuery).Must(filterByBuildQuery).
-	//newquery := elastic.NewBoolQuery().Must(searchQuery).Must(filterByBuildQuery)
+	filterQuery := elastic.NewBoolQuery().Must(filterByHostnameQuery).Must(filterByBuildQuery)
 
 	//for filter based on last build num use aggregation max with release
 
 	SearchResult, err := client.Search().
 		Index(conf.ElasticSearchReportIndex). // search in index "testutkarsh"
-		Query(filterByBuildQuery).
+		Query(filterQuery).
 		From(0).Size(100).
 		Pretty(true).
 		Do(context.Background())
