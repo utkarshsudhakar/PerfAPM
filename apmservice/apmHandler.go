@@ -232,13 +232,15 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println(jobData[i].Type)
 			//sresp, _ := time.Parse(config.TimeFormat, resp).String()
 
-			if jobData[i].Status != "SUCCESS" {
+			fmt.Println(jobData[i].Type)
+			if jobData[i].Type != "Purge" {
+				if jobData[i].Status != "SUCCESS" {
 
-				utils.RespondWithText("Scanner Execution not completed or Failed! Please Check.", w, r)
-				flag = false
-				break
+					utils.RespondWithText("Scanner Execution not completed or Failed! Please Check.", w, r)
+					flag = false
+					break
+				}
 			}
-
 			taskResponseData := utils.GetTaskData(ldmHeader.InfaToken, jobData[i].ID, jobData[i].Taskid, TaskURL, resp, client)
 			//fmt.Println(len(taskResponseData[0].Progress))
 
