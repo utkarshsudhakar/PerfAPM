@@ -232,7 +232,6 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println(jobData[i].Type)
 			//sresp, _ := time.Parse(config.TimeFormat, resp).String()
 
-			fmt.Println(jobData[i].Type)
 			if jobData[i].Type != "Purge" {
 				if jobData[i].Status != "SUCCESS" {
 
