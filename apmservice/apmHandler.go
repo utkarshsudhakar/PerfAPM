@@ -37,9 +37,10 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	newRelease := r.URL.Query().Get("newRelease")
 	Hostname := r.URL.Query().Get("Hostname")
+	completeReport := r.URL.Query().Get("completeReport") // True/False
 
-	oldReleaseData := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
-	newReleaseData := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
+	oldReleaseData, oldBuildDataTask := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
+	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
 
 	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
 
@@ -52,6 +53,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		for ResourceName, v := range oldReleaseData {
 
 			if _, ok := newReleaseData[ResourceName]; ok {
+				p = p + fmt.Sprintf("<div style='background:yellow;text-align:center'><p><b>Resource Summary : %s </p> </b></div>", ResourceName)
 
 				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldRelease, newRelease)
 
@@ -77,9 +79,49 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 					}
 				}
-				p = p + "</tbody></table></body><br/><br/>"
 			}
 
+			p = p + "</tbody></table></body><br/><br/>"
+			if completeReport == "True" {
+
+				for TaskName, value := range oldBuildDataTask[ResourceName] {
+					//fmt.Printf("TaskName is:%s\n", TaskName)
+
+					//ks := reflect.ValueOf(value).MapKeys()
+					//fmt.Println(oldBuildDataTask[ResourceName][TaskName])
+					val, _ := value.(map[string]interface{})
+
+					if _, ok := newBuildDataTask[ResourceName][TaskName]; ok {
+						p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#7388f9;color:white;'><b>Task Name : %s </b></td></tr><tr><th>Sub Task</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", TaskName, oldRelease, newRelease)
+
+						for key := range val {
+							//fmt.Println(oldBuildDataTask[TaskName][key])
+
+							svOldTask := oldBuildDataTask[ResourceName][TaskName].(map[string]interface{})[key].(string)
+							svNewTask := newBuildDataTask[ResourceName][TaskName].(map[string]interface{})[key].(string)
+							timeOldTask, _ := time.Parse(config.TimeFormat, svOldTask)
+							timeNewTask, _ := time.Parse(config.TimeFormat, svNewTask)
+							diffTask := timeNewTask.Sub(timeOldTask)
+
+							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 5) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 5) {
+								if diffTask <= 0 {
+									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
+
+									p = p + "<tr style='background:#a7f392'><td>" + key + "</td><td>" + svOldTask + "</td><td>" + svNewTask + "</td><td>" + diffTask.String() + " </td><td>" + strconv.FormatFloat(percDiffTask, 'f', 2, 64) + " %</td></tr>"
+
+								} else {
+
+									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
+									p = p + "<tr style='background:#f99'><td>" + key + "</td><td>" + svOldTask + "</td><td>" + svNewTask + "</td><td>" + diffTask.String() + " </td><td>" + strconv.FormatFloat(percDiffTask, 'f', 2, 64) + " %</td></tr>"
+								}
+							}
+						}
+
+						p = p + "</tbody></table></body><br/><br/>"
+					}
+
+				}
+			}
 		}
 		//fmt.Println(p)
 		conf := utils.ReadConfig()
@@ -94,10 +136,11 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 	oldBuildNum := r.URL.Query().Get("oldBuildNum") //427.4
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	Release := r.URL.Query().Get("Release")
-	Hostname := r.URL.Query().Get("Hostname") // "10.2.2"
+	Hostname := r.URL.Query().Get("Hostname")             // "10.2.2"
+	completeReport := r.URL.Query().Get("completeReport") // True/False
 
-	oldBuildData := utils.GetBuildData(oldBuildNum, Hostname)
-	newBuildData := utils.GetBuildData(newBuildNum, Hostname)
+	oldBuildData, oldBuildDataTask := utils.GetBuildData(oldBuildNum, Hostname)
+	newBuildData, newBuildDataTask := utils.GetBuildData(newBuildNum, Hostname)
 
 	if (len(newBuildData) == 0) || (len(oldBuildData) == 0) {
 
@@ -111,11 +154,12 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		for ResourceName, v := range oldBuildData {
 
 			if _, ok := newBuildData[ResourceName]; ok {
+				p = p + fmt.Sprintf("<div style='background:yellow;text-align:center'><p><b>Resource Summary : %s </p> </b></div>", ResourceName)
 
 				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldBuildNum, newBuildNum)
 
 				for k := range v {
-
+					//fmt.Println(oldBuildData[ResourceName][k])
 					svOld := oldBuildData[ResourceName][k].(string)
 					svNew := newBuildData[ResourceName][k].(string)
 					timeOld, _ := time.Parse(config.TimeFormat, svOld)
@@ -126,17 +170,57 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 						if diff <= 0 {
 							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
-							p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+							p = p + "<tr style='background:#a7f392'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 
 						} else {
 
 							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
-							p = p + "<tr style='background:#ff9e82'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+							p = p + "<tr style='background:#f99'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 						}
 					}
 
 				}
-				p = p + "</tbody></table></body><br/><br/>"
+			}
+			p = p + "</tbody></table></body><br/><br/>"
+			if completeReport == "True" {
+
+				for TaskName, value := range oldBuildDataTask[ResourceName] {
+					//fmt.Printf("TaskName is:%s\n", TaskName)
+
+					//ks := reflect.ValueOf(value).MapKeys()
+					//fmt.Println(oldBuildDataTask[ResourceName][TaskName])
+					val, _ := value.(map[string]interface{})
+
+					if _, ok := newBuildDataTask[ResourceName][TaskName]; ok {
+						p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#7388f9;color:white;'><b>Task Name : %s </b></td></tr><tr><th>Sub Task</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", TaskName, oldBuildNum, newBuildNum)
+
+						for key := range val {
+							//fmt.Println(oldBuildDataTask[TaskName][key])
+
+							svOldTask := oldBuildDataTask[ResourceName][TaskName].(map[string]interface{})[key].(string)
+							svNewTask := newBuildDataTask[ResourceName][TaskName].(map[string]interface{})[key].(string)
+							timeOldTask, _ := time.Parse(config.TimeFormat, svOldTask)
+							timeNewTask, _ := time.Parse(config.TimeFormat, svNewTask)
+							diffTask := timeNewTask.Sub(timeOldTask)
+
+							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 5) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 5) {
+								if diffTask <= 0 {
+									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
+
+									p = p + "<tr style='background:#a7f392'><td>" + key + "</td><td>" + svOldTask + "</td><td>" + svNewTask + "</td><td>" + diffTask.String() + " </td><td>" + strconv.FormatFloat(percDiffTask, 'f', 2, 64) + " %</td></tr>"
+
+								} else {
+
+									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
+									p = p + "<tr style='background:#f99'><td>" + key + "</td><td>" + svOldTask + "</td><td>" + svNewTask + "</td><td>" + diffTask.String() + " </td><td>" + strconv.FormatFloat(percDiffTask, 'f', 2, 64) + " %</td></tr>"
+								}
+							}
+						}
+						p = p + "</tbody></table></body><br/><br/>"
+
+					}
+
+				}
 
 			}
 

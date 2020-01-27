@@ -13,7 +13,7 @@ import (
 )
 
 //GetReleaseData ...
-func GetReleaseData(buildNum string, release string, Hostname string) map[string]map[string]interface{} {
+func GetReleaseData(buildNum string, release string, Hostname string) (map[string]map[string]interface{}, map[string]map[string]interface{}) {
 
 	//Hostname := "irl62dqd07"
 	conf := ReadConfig()
@@ -40,8 +40,8 @@ func GetReleaseData(buildNum string, release string, Hostname string) map[string
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
 	filterByReleaseQuery := elastic.NewTermQuery("Release.keyword", release)
-	filterByHostnameQuery := elastic.NewTermQuery("Hostname", Hostname)
-	filterQuery := elastic.NewBoolQuery().Must(filterByReleaseQuery).Must(filterByBuildQuery).Must(filterByHostnameQuery)
+	searchQuery := elastic.NewTermQuery("Hostname", Hostname)
+	filterQuery := elastic.NewBoolQuery().Must(filterByReleaseQuery).Must(filterByBuildQuery).Must(searchQuery)
 	//searchQuery := elastic.NewRegexpQuery("Hostname", "sql.*")
 	//labelQuery := elastic.NewFilterAggregation
 	//dataQuery := elastic.NewBoolQuery().Must(labelQuery).Must(filterByBuildQuery).
@@ -64,6 +64,8 @@ func GetReleaseData(buildNum string, release string, Hostname string) map[string
 
 		var t config.TimesResponse
 		var myMap map[string]interface{}
+		var tasktimes map[string]interface{}
+		newTaskMap := make(map[string]map[string]interface{})
 		newMap := make(map[string]map[string]interface{})
 
 		for _, hit := range SearchResult.Hits.Hits {
@@ -78,13 +80,16 @@ func GetReleaseData(buildNum string, release string, Hostname string) map[string
 				//key := strings.Split(string(t.ResourceName), "_")
 				key := t.ResourceName
 				myMap = t.Times.(map[string]interface{})
+				tasktimes = t.TaskTimes.(map[string]interface{})
+				//fmt.Println(tasktimes)
+				newTaskMap[key] = tasktimes
 
 				newMap[key] = myMap
 			}
 
 		}
-
-		return newMap
+		//fmt.Println(newTaskMap)
+		return newMap, newTaskMap
 
 	}
 
@@ -93,6 +98,6 @@ func GetReleaseData(buildNum string, release string, Hostname string) map[string
 
 	fmt.Println(msg)
 
-	return nil
+	return nil, nil
 
 }

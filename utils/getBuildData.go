@@ -13,7 +13,7 @@ import (
 )
 
 //GetBuildData ...
-func GetBuildData(buildNum string, Hostname string) map[string]map[string]interface{} {
+func GetBuildData(buildNum string, Hostname string) (map[string]map[string]interface{}, map[string]map[string]interface{}) {
 
 	//Hostname := "irl62dqd07"
 	conf := ReadConfig()
@@ -39,16 +39,16 @@ func GetBuildData(buildNum string, Hostname string) map[string]map[string]interf
 
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
-	filterByHostnameQuery := elastic.NewTermQuery("Hostname", Hostname)
+	searchQuery := elastic.NewTermQuery("Hostname", Hostname)
 	//labelQuery := elastic.NewFilterAggregation
 	//dataQuery := elastic.NewBoolQuery().Must(labelQuery).Must(filterByBuildQuery).
-	filterQuery := elastic.NewBoolQuery().Must(filterByHostnameQuery).Must(filterByBuildQuery)
+	newquery := elastic.NewBoolQuery().Must(searchQuery).Must(filterByBuildQuery)
 
 	//for filter based on last build num use aggregation max with release
 
 	SearchResult, err := client.Search().
 		Index(conf.ElasticSearchReportIndex). // search in index "testutkarsh"
-		Query(filterQuery).
+		Query(newquery).
 		From(0).Size(100).
 		Pretty(true).
 		Do(context.Background())
@@ -61,6 +61,8 @@ func GetBuildData(buildNum string, Hostname string) map[string]map[string]interf
 
 		var t config.TimesResponse
 		var myMap map[string]interface{}
+		var tasktimes map[string]interface{}
+		newTaskMap := make(map[string]map[string]interface{})
 		newMap := make(map[string]map[string]interface{})
 
 		for _, hit := range SearchResult.Hits.Hits {
@@ -75,13 +77,16 @@ func GetBuildData(buildNum string, Hostname string) map[string]map[string]interf
 				//key := strings.Split(string(t.ResourceName), "_")
 				key := t.ResourceName
 				myMap = t.Times.(map[string]interface{})
+				tasktimes = t.TaskTimes.(map[string]interface{})
+				//fmt.Println(tasktimes)
+				newTaskMap[key] = tasktimes
 
 				newMap[key] = myMap
 			}
 
 		}
-
-		return newMap
+		//fmt.Println(newTaskMap)
+		return newMap, newTaskMap
 
 	}
 
@@ -90,6 +95,6 @@ func GetBuildData(buildNum string, Hostname string) map[string]map[string]interf
 
 	fmt.Println(msg)
 
-	return nil
+	return nil, nil
 
 }
