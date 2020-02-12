@@ -65,7 +65,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 					timeNew, _ := time.Parse(config.TimeFormat, svNew)
 					diff := timeNew.Sub(timeOld)
 
-					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 5) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 5) {
+					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
 						if diff <= 0 {
 							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
@@ -103,7 +103,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 							timeNewTask, _ := time.Parse(config.TimeFormat, svNewTask)
 							diffTask := timeNewTask.Sub(timeOldTask)
 
-							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 5) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 5) {
+							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 30) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 30) {
 								if diffTask <= 0 {
 									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
 
@@ -127,6 +127,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		conf := utils.ReadConfig()
 		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
 		utils.SendMail(p, subject)
+		//fmt.Println(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
 
@@ -166,7 +167,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 					timeNew, _ := time.Parse(config.TimeFormat, svNew)
 					diff := timeNew.Sub(timeOld)
 
-					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 5) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 5) {
+					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
 						if diff <= 0 {
 							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
@@ -203,7 +204,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 							timeNewTask, _ := time.Parse(config.TimeFormat, svNewTask)
 							diffTask := timeNewTask.Sub(timeOldTask)
 
-							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 5) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 5) {
+							if ((timeOldTask.Second() + (timeOldTask.Minute() * 60) + (timeOldTask.Hour() * 3600)) > 30) && ((timeNewTask.Second() + (timeNewTask.Minute() * 60) + (timeNewTask.Hour() * 3600)) > 30) {
 								if diffTask <= 0 {
 									percDiffTask := utils.CalcPerc(float64(diffTask.Seconds()), timeOldTask)
 
@@ -229,6 +230,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		conf := utils.ReadConfig()
 		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
 		utils.SendMail(p, subject)
+		//fmt.Println(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
 
