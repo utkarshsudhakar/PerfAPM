@@ -9,7 +9,7 @@ import (
 	//"gopkg.in/gomail.v2"
 )
 
-func SendMail(body string, subject string) {
+func SendMail(body string, subject string,cc string) {
 
 	from := config.FromEmail
 
@@ -21,6 +21,7 @@ func SendMail(body string, subject string) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
 	m.SetHeader("To", to...)
+	m.SetHeader("Cc", cc)
 
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)

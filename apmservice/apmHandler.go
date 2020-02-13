@@ -38,6 +38,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	newRelease := r.URL.Query().Get("newRelease")
 	Hostname := r.URL.Query().Get("Hostname")
 	completeReport := r.URL.Query().Get("completeReport") // True/False
+	cc := r.URL.Query().Get("email")
 
 	oldReleaseData, oldBuildDataTask := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
 	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
@@ -126,7 +127,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println(p)
 		conf := utils.ReadConfig()
 		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
-		utils.SendMail(p, subject)
+		utils.SendMail(p, subject, cc)
 		//fmt.Println(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
@@ -139,6 +140,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 	Release := r.URL.Query().Get("Release")
 	Hostname := r.URL.Query().Get("Hostname")             // "10.2.2"
 	completeReport := r.URL.Query().Get("completeReport") // True/False
+	cc := r.URL.Query().Get("email")
 
 	oldBuildData, oldBuildDataTask := utils.GetBuildData(oldBuildNum, Hostname)
 	newBuildData, newBuildDataTask := utils.GetBuildData(newBuildNum, Hostname)
@@ -229,7 +231,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println(p)
 		conf := utils.ReadConfig()
 		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
-		utils.SendMail(p, subject)
+		utils.SendMail(p, subject, cc)
 		//fmt.Println(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
