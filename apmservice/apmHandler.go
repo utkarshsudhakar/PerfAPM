@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -36,13 +37,12 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	oldRelease := r.URL.Query().Get("oldRelease")   // "10.2.2"
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	newRelease := r.URL.Query().Get("newRelease")
-	HostnameOld := r.URL.Query().Get("HostnameOld")
-	HostnameNew := r.URL.Query().Get("HostnameNew")
+	Hostname := r.URL.Query().Get("Hostname")
 	completeReport := r.URL.Query().Get("completeReport") // True/False
 	cc := r.URL.Query().Get("email")
 
-	oldReleaseData, oldBuildDataTask := utils.GetReleaseData(oldBuildNum, oldRelease, HostnameOld)
-	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, HostnameNew)
+	oldReleaseData, oldBuildDataTask := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
+	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
 
 	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
 
@@ -129,6 +129,20 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		conf := utils.ReadConfig()
 		p = p + "<b>Dashboard URL : </b>" + conf.DashboardURL
 		utils.SendMail(p, subject, cc)
+
+		//write to file
+		fileName := "../htmlReport/report" + oldRelease + "vs" + newRelease + ".html"
+		f, err := os.Create(fileName)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer f.Close()
+
+		_, err = f.WriteString(p)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		//fmt.Println(p)
 		utils.RespondWithJSON("Email Sent Successfully", w, r)
 	}
@@ -139,13 +153,12 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 	oldBuildNum := r.URL.Query().Get("oldBuildNum") //427.4
 	newBuildNum := r.URL.Query().Get("newBuildNum") //427.5
 	Release := r.URL.Query().Get("Release")
-	HostnameOld := r.URL.Query().Get("HostnameOld") // "10.2.2"
-	HostnameNew := r.URL.Query().Get("HostnameNew")
+	Hostname := r.URL.Query().Get("Hostname")             // "10.2.2"
 	completeReport := r.URL.Query().Get("completeReport") // True/False
 	cc := r.URL.Query().Get("email")
 
-	oldBuildData, oldBuildDataTask := utils.GetBuildData(oldBuildNum, HostnameOld)
-	newBuildData, newBuildDataTask := utils.GetBuildData(newBuildNum, HostnameNew)
+	oldBuildData, oldBuildDataTask := utils.GetBuildData(oldBuildNum, Hostname)
+	newBuildData, newBuildDataTask := utils.GetBuildData(newBuildNum, Hostname)
 
 	if (len(newBuildData) == 0) || (len(oldBuildData) == 0) {
 
@@ -383,4 +396,13 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 			w.Write(jsonBody)
 		}
 	}
+}
+
+func htmlReport(w http.ResponseWriter, r *http.Request) {
+
+	p := "../" + r.URL.Path
+	//fmt.Println(r.URL.Path)
+
+	http.ServeFile(w, r, p)
+
 }

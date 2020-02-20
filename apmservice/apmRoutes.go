@@ -8,5 +8,6 @@ func Init() {
 	http.HandleFunc("/compareRelease", compareRelease)
 	http.HandleFunc("/test", test)
 	http.HandleFunc("/createJson", createJson)
+	http.HandleFunc("/htmlReport/", htmlReport)
 
 }
