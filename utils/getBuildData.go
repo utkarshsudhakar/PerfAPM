@@ -39,7 +39,7 @@ func GetBuildData(buildNum string, Hostname string) (map[string]map[string]inter
 
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
-	searchQuery := elastic.NewTermQuery("Hostname", Hostname)
+	searchQuery := elastic.NewRegexpQuery("Hostname", Hostname)
 	//labelQuery := elastic.NewFilterAggregation
 	//dataQuery := elastic.NewBoolQuery().Must(labelQuery).Must(filterByBuildQuery).
 	newquery := elastic.NewBoolQuery().Must(searchQuery).Must(filterByBuildQuery)

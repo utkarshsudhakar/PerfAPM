@@ -40,7 +40,7 @@ func GetReleaseData(buildNum string, release string, Hostname string) (map[strin
 	// Get doc for the specific buildnumber
 	filterByBuildQuery := elastic.NewTermQuery("Build", buildNum)
 	filterByReleaseQuery := elastic.NewTermQuery("Release.keyword", release)
-	searchQuery := elastic.NewTermQuery("Hostname", Hostname)
+	searchQuery := elastic.NewRegexpQuery("Hostname", Hostname)
 	filterQuery := elastic.NewBoolQuery().Must(filterByReleaseQuery).Must(filterByBuildQuery).Must(searchQuery)
 	//searchQuery := elastic.NewRegexpQuery("Hostname", "sql.*")
 	//labelQuery := elastic.NewFilterAggregation
