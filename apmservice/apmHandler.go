@@ -131,7 +131,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		utils.SendMail(p, subject, cc)
 
 		//write to file
-		fileName := "../htmlReport/report" + oldRelease + "vs" + newRelease + ".html"
+		fileName := "../htmlReport/EDCPerformance_report_" + oldRelease + "vs" + newRelease + ".html"
 		f, err := os.Create(fileName)
 		if err != nil {
 			fmt.Println(err)
