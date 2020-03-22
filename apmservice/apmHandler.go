@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/tidwall/sjson"
-	"github.com/utkarshsudhakar/PerfAPM/config"
-	"github.com/utkarshsudhakar/PerfAPM/utils"
+	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/demo_app/utils"
 )
 
 func test(w http.ResponseWriter, r *http.Request) {
