@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 	"gopkg.in/gomail.v2"
 	//"gopkg.in/gomail.v2"
 )

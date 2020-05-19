@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 func GetTaskData(InfaToken string, jobID string, taskID string, TaskURL string, resp *http.Response, client *http.Client) config.TaskResponse {

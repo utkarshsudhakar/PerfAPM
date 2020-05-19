@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 //RespondWithJSON ...
