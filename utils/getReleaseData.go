@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/olivere/elastic"
-	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 //GetReleaseData ...

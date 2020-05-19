@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/utkarshsudhakar/demo_app/config"
+	"github.com/utkarshsudhakar/PerfAPM/config"
 )
 
 func IntVal(str string) int64 {
