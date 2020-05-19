@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/utkarshsudhakar/PerfAPM/config"
+	"github.com/utkarshsudhakar/demo_app/config"
 )
 
 func GetJobData(resp *http.Response, client *http.Client, JobURL string, ResourceName string, ldmHeader config.LDMHeader) (config.JobResponse, *http.Client, bool) {
