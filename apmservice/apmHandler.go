@@ -61,24 +61,29 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 				for k := range v {
 
-					svOld := oldReleaseData[ResourceName][k].(string)
-					svNew := newReleaseData[ResourceName][k].(string)
-					timeOld, _ := time.Parse(config.TimeFormat, svOld)
-					timeNew, _ := time.Parse(config.TimeFormat, svNew)
-					diff := timeNew.Sub(timeOld)
+					if k != "Purge" {
+						svOld := oldReleaseData[ResourceName][k].(string)
+						//fmt.Println(ResourceName)
+						//fmt.Println(k)
+						//fmt.Println(newReleaseData[ResourceName][k])
+						svNew := newReleaseData[ResourceName][k].(string)
+						timeOld, _ := time.Parse(config.TimeFormat, svOld)
+						timeNew, _ := time.Parse(config.TimeFormat, svNew)
+						diff := timeNew.Sub(timeOld)
 
-					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
-						if diff <= 0 {
-							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+						if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
+							if diff <= 0 {
+								percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
-							p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+								p = p + "<tr style='background:#80CA80'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 
-						} else {
+							} else {
 
-							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
-							p = p + "<tr style='background:#ff9e82'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+								percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+								p = p + "<tr style='background:#ff9e82'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+							}
+
 						}
-
 					}
 				}
 			}
@@ -177,24 +182,28 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Build# %s </th><th>Build# %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldBuildNum, newBuildNum)
 
 				for k := range v {
-					//fmt.Println(oldBuildData[ResourceName][k])
-					svOld := oldBuildData[ResourceName][k].(string)
-					svNew := newBuildData[ResourceName][k].(string)
-					timeOld, _ := time.Parse(config.TimeFormat, svOld)
-					timeNew, _ := time.Parse(config.TimeFormat, svNew)
-					diff := timeNew.Sub(timeOld)
 
-					if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
-						if diff <= 0 {
-							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+					if k != "Purge" {
+						//fmt.Println(oldBuildData[ResourceName][k])
+						svOld := oldBuildData[ResourceName][k].(string)
+						svNew := newBuildData[ResourceName][k].(string)
+						timeOld, _ := time.Parse(config.TimeFormat, svOld)
+						timeNew, _ := time.Parse(config.TimeFormat, svNew)
+						diff := timeNew.Sub(timeOld)
 
-							p = p + "<tr style='background:#a7f392'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+						if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
+							if diff <= 0 {
+								percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
-						} else {
+								p = p + "<tr style='background:#a7f392'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
 
-							percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
-							p = p + "<tr style='background:#f99'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+							} else {
+
+								percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
+								p = p + "<tr style='background:#f99'><td>" + k + "</td><td>" + svOld + "</td><td>" + svNew + "</td><td>" + diff.String() + " </td><td>" + strconv.FormatFloat(percDiff, 'f', 2, 64) + " %</td></tr>"
+							}
 						}
+
 					}
 
 				}
