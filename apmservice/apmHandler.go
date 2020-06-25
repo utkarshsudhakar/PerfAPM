@@ -44,6 +44,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	oldReleaseData, oldBuildDataTask := utils.GetReleaseData(oldBuildNum, oldRelease, Hostname)
 	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
 
+	//fmt.Println(newReleaseData)
 	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
 
 		utils.RespondWithJSON("BuildNumber/Release not correct or not enough data ", w, r)

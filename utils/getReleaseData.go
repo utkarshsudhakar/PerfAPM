@@ -52,7 +52,7 @@ func GetReleaseData(buildNum string, release string, Hostname string) (map[strin
 	SearchResult, err := client.Search().
 		Index(conf.ElasticSearchReportIndex). // search in index "testutkarsh"
 		Query(filterQuery).
-		From(0).Size(100).
+		From(0).Size(1000).
 		Pretty(true).
 		Do(context.Background())
 
