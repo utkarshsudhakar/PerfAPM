@@ -49,15 +49,16 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithJSON("BuildNumber/Release not correct or not enough data ", w, r)
 
 	} else {
-		subject := fmt.Sprintf("Release Comparison Report for %s & %s", oldRelease, newRelease)
-		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Release Comparison for %s & %s </h3> <br/> <br/>", oldRelease, newRelease)
+		subject := fmt.Sprintf("Release Comparison Report for %s (%s) & %s (%s)", oldRelease, oldBuildNum, newRelease, newBuildNum)
+		p := fmt.Sprintf("<body style='background:white'><h3 style='background:#0790bd;color:#fff;padding:5px;text-align:center;border-radius:5px;'> Release Comparison for %s (%s) & %s (%s) </h3> <br/> <br/>", oldRelease, oldBuildNum, newRelease, newBuildNum)
 
 		for ResourceName, v := range oldReleaseData {
 
 			if _, ok := newReleaseData[ResourceName]; ok {
-				p = p + fmt.Sprintf("<div style='background:yellow;text-align:center'><p><b>Resource Summary : %s </p> </b></div>", ResourceName)
+				DisplayResourceName := strings.Split(string(ResourceName), "__")
+				p = p + fmt.Sprintf("<div style='background:yellow;text-align:center'><p><b>Resource Summary : %s </p> </b></div>", DisplayResourceName[0])
 
-				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s </b></td></tr><tr><th>Stage</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", ResourceName, oldRelease, newRelease)
+				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s | Hostname : %s </b></td></tr><tr><th>Stage</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", DisplayResourceName[0], DisplayResourceName[1], oldRelease, newRelease)
 
 				for k := range v {
 

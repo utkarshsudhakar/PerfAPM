@@ -78,7 +78,7 @@ func GetReleaseData(buildNum string, release string, Hostname string) (map[strin
 
 			if t.Times != nil {
 				//key := strings.Split(string(t.ResourceName), "_")
-				key := t.ResourceName
+				key := t.ResourceName + "__" + t.Hostname
 				myMap = t.Times.(map[string]interface{})
 				tasktimes = t.TaskTimes.(map[string]interface{})
 				//fmt.Println(tasktimes)
