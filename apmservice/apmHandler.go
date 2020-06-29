@@ -63,7 +63,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 				for k := range v {
 
-					if k != "Purge" {
+					if k != "Purge" && k != "Delete" {
 						svOld := oldReleaseData[ResourceName][k].(string)
 						//fmt.Println(ResourceName)
 						//fmt.Println(k)
@@ -185,7 +185,7 @@ func compareBuild(w http.ResponseWriter, r *http.Request) {
 
 				for k := range v {
 
-					if k != "Purge" {
+					if k != "Purge" && k != "Delete" {
 						//fmt.Println(oldBuildData[ResourceName][k])
 						svOld := oldBuildData[ResourceName][k].(string)
 						svNew := newBuildData[ResourceName][k].(string)
@@ -346,7 +346,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println(jobData[i].Type)
 			//sresp, _ := time.Parse(config.TimeFormat, resp).String()
 
-			if jobData[i].Type != "Purge" {
+			if jobData[i].Type != "Purge" && jobData[i].Type != "Delete" {
 				if jobData[i].Status != "SUCCESS" {
 
 					utils.RespondWithText("Scanner Execution not completed or Failed! Please Check.", w, r)
@@ -381,7 +381,8 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 
 		if flag {
 
-			if len(jobData) > 1 && jobData[1].Type != "Purge" {
+			//fmt.Println(jobData[0].Type)
+			if (len(jobData) > 1 && jobData[1].Type != "Purge") && (len(jobData) > 1 && jobData[0].Type != "Delete") {
 				endToEndTime := utils.EndToEndTime(jobData)
 				elasticJson, _ = sjson.Set(elasticJson, "Times.End to End Execution Time", endToEndTime)
 			}
