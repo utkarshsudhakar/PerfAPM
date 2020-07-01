@@ -23,17 +23,17 @@ func EndToEndTime(jobData config.JobResponse) string {
 	minTime, _ := strconv.ParseInt(sminTime, 10, 64)
 	for i := 1; i < len(jobData); i++ {
 
-		if jobData[i].Type != "Purge" {
-		if IntVal(jobData[i].EndTime) > maxTime {
-			maxTime = IntVal(jobData[i].EndTime)
-			//fmt.Println(maxTime)
-		}
+		if (jobData[i].Type != "Purge") && (jobData[i].Type != "Delete") {
+			if IntVal(jobData[i].EndTime) > maxTime {
+				maxTime = IntVal(jobData[i].EndTime)
+				//fmt.Println(maxTime)
+			}
 
-		if IntVal(jobData[i].StartTime) < minTime {
-			minTime = IntVal(jobData[i].StartTime)
-			//fmt.Println(minTime)
+			if IntVal(jobData[i].StartTime) < minTime {
+				minTime = IntVal(jobData[i].StartTime)
+				//fmt.Println(minTime)
+			}
 		}
-	}
 	}
 
 	startTime := time.Unix(0, minTime*int64(time.Millisecond))

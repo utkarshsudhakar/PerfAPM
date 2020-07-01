@@ -273,6 +273,13 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 	Release := r.URL.Query().Get("release")
 	User := r.URL.Query().Get("user")
 	Pass := r.URL.Query().Get("pass")
+
+	if utils.CheckDuplicate(Build, Release, Hostname, ResourceName) {
+		msg := fmt.Sprintf("Data Already Exists for the Resource : %s. Please delete existing data first!", ResourceName)
+		utils.RespondWithText(msg, w, r)
+		//return
+
+	}
 	//regp := regexp.MustCompile("\\/\\/(.+)\\.informatica")
 	//Host := regp.FindStringSubmatch(Hostname)
 	flag := true
