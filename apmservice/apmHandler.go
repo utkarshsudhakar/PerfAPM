@@ -277,7 +277,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 	if utils.CheckDuplicate(Build, Release, Hostname, ResourceName) {
 		msg := fmt.Sprintf("Data Already Exists for the Resource : %s. Please delete existing data first!", ResourceName)
 		utils.RespondWithText(msg, w, r)
-		//return
+		return
 
 	}
 	//regp := regexp.MustCompile("\\/\\/(.+)\\.informatica")
