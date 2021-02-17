@@ -45,6 +45,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 	newReleaseData, newBuildDataTask := utils.GetReleaseData(newBuildNum, newRelease, Hostname)
 
 	//fmt.Println(newReleaseData)
+	//fmt.Println(oldReleaseData)
 	if (len(newReleaseData) == 0) || (len(oldReleaseData) == 0) {
 
 		utils.RespondWithJSON("BuildNumber/Release not correct or not enough data ", w, r)
@@ -57,6 +58,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 
 			if _, ok := newReleaseData[ResourceName]; ok {
 				DisplayResourceName := strings.Split(string(ResourceName), "__")
+
 				p = p + fmt.Sprintf("<div style='background:yellow;text-align:center'><p><b>Resource Summary : %s </p> </b></div>", DisplayResourceName[0])
 
 				p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#444;color:white;'><b>Resource Name : %s | Hostname : %s </b></td></tr><tr><th>Stage</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", DisplayResourceName[0], DisplayResourceName[1], oldRelease, newRelease)
@@ -68,6 +70,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 						//fmt.Println(ResourceName)
 						//fmt.Println(k)
 						//fmt.Println(newReleaseData[ResourceName][k])
+
 						if newReleaseData[ResourceName][k] != nil {
 
 							svNew := newReleaseData[ResourceName][k].(string)
@@ -76,6 +79,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 							diff := timeNew.Sub(timeOld)
 
 							if ((timeOld.Second() + (timeOld.Minute() * 60) + (timeOld.Hour() * 3600)) > 30) && ((timeNew.Second() + (timeNew.Minute() * 60) + (timeNew.Hour() * 3600)) > 30) {
+
 								if diff <= 0 {
 									percDiff := utils.CalcPerc(float64(diff.Seconds()), timeOld)
 
@@ -104,6 +108,7 @@ func compareRelease(w http.ResponseWriter, r *http.Request) {
 					val, _ := value.(map[string]interface{})
 
 					if _, ok := newBuildDataTask[ResourceName][TaskName]; ok {
+
 						p = p + fmt.Sprintf("<table style='backgound:#fff;border-collapse: collapse;' border = '1' cellpadding = '6'><tbody><tr><td colspan=5 style='text-align:center;background-color:#7388f9;color:white;'><b>Task Name : %s </b></td></tr><tr><th>Sub Task</th><th>Release: %s </th><th>Release: %s</th><th>Time Difference</th><th> %% Time Difference</th></tr> ", TaskName, oldRelease, newRelease)
 
 						for key := range val {
@@ -356,7 +361,7 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 			//fmt.Println(jobData[i].Type)
 			//sresp, _ := time.Parse(config.TimeFormat, resp).String()
 
-			if jobData[i].Type != "Purge" && jobData[i].Type != "Delete" {
+			if jobData[i].Type != "Purge" && jobData[i].Type != "Delete" && jobData[i].Type != "Configuration purge" {
 				if jobData[i].Status != "SUCCESS" {
 
 					utils.RespondWithText("Scanner Execution not completed or Failed! Please Check.", w, r)
@@ -391,11 +396,11 @@ func createJson(w http.ResponseWriter, r *http.Request) {
 
 		if flag {
 
-			//fmt.Println(jobData[0].Type)
-			if (len(jobData) > 1 && jobData[1].Type != "Purge") && (len(jobData) > 1 && jobData[0].Type != "Delete") {
-				endToEndTime := utils.EndToEndTime(jobData)
-				elasticJson, _ = sjson.Set(elasticJson, "Times.End to End Execution Time", endToEndTime)
-			}
+			//fmt.Println(jobData[1].Type)
+			//	if (len(jobData) > 1 && jobData[1].Type != "Purge") && (len(jobData) > 1 && jobData[0].Type != "Delete") && (len(jobData) > 1 && jobData[0].Type != "Configuration purge") {
+			endToEndTime := utils.EndToEndTime(jobData)
+			elasticJson, _ = sjson.Set(elasticJson, "Times.End to End Execution Time", endToEndTime)
+			//}
 
 			elasticJson, _ := sjson.Set(elasticJson, "ResourceName", ResourceName)
 			elasticJson, _ = sjson.Set(elasticJson, "Hostname", Hostname)
